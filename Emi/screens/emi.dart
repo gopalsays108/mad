@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:second_app/widget/slider_widget.dart';
 import 'package:second_app/widget/textbox_widget.dart';
 
+import '../widget/chart_widget.dart';
+
 class Emi extends StatefulWidget {
   const Emi({Key? key}) : super(key: key);
 
@@ -11,6 +13,7 @@ class Emi extends StatefulWidget {
 
 class _EmiState extends State<Emi> {
   int _value = 1; // in dart file
+  double monthlyRoi = 0.0;
   TextEditingController t1 = TextEditingController();
   TextEditingController t2 = TextEditingController();
   TextEditingController t3 = TextEditingController();
@@ -28,7 +31,7 @@ class _EmiState extends State<Emi> {
     int roi = int.parse(t2.text);
     int tenure = int.parse(t3.text);
     double monthlyPr = loanAmount / tenure;
-    double monthlyRoi = (loanAmount * (roi / 100)) / tenure;
+    monthlyRoi = (loanAmount * (roi / 100)) / tenure;
     emi = monthlyPr + monthlyRoi;
     setState(() {});
   }
@@ -41,23 +44,28 @@ class _EmiState extends State<Emi> {
     tb.setFunction(takeSliderValue);
 
     return Scaffold(
-      body: Column(
-        children: [
-          TextBoxWidget(label: 'Loan Amount', iconData: Icons.money, tc: t1),
-          TextBoxWidget(label: 'ROI', iconData: Icons.attach_money, tc: t2),
-          tb,
-          SliderWidget(takeSliderValue, _value),
-          //pass func as arg to constructor
-          ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor:
-                  MaterialStateProperty.all(Colors.deepOrangeAccent),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            TextBoxWidget(label: 'Loan Amount', iconData: Icons.money, tc: t1),
+            TextBoxWidget(label: 'ROI', iconData: Icons.attach_money, tc: t2),
+            tb,
+            SliderWidget(takeSliderValue, _value),
+            //pass func as arg to constructor
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(Colors.deepOrangeAccent),
+              ),
+              onPressed: _compute,
+              child: Text('Compute'),
             ),
-            onPressed: _compute,
-            child: Text('Compute'),
-          ),
-          Text("Emi $emi"),
-        ],
+            Text("Emi $emi"),
+
+            Text('EMI ${emi % 12}', style: TextStyle(fontSize: 30)),
+            PieChar(monthlyRoi * 12, emi * 12),
+          ],
+        ),
       ),
       appBar: AppBar(
         title: Text('Emi Calculator'),
